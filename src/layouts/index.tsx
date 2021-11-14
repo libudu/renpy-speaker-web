@@ -1,7 +1,7 @@
-import Header from './components/Header';
 import { IRouteComponentProps, useModel } from 'umi';
-import { Button } from 'antd';
+import { Button, Input, message } from 'antd';
 import { useState } from 'react';
+import { appConfig, DEVELOPER_CONFIG, fetchTextVoice } from '@/utils/aliyunTts';
 
 const Layout: React.FC<IRouteComponentProps> = ({ children, location }) => {
   const {
@@ -11,17 +11,59 @@ const Layout: React.FC<IRouteComponentProps> = ({ children, location }) => {
     chooseDialogueFile,
   } = useModel('configs');
 
+  const [appkey, setAppkey] = useState('');
+  const [token, setToken] = useState('');
   const [tmp, setTmp] = useState(false);
+  
 
   if(!tmp) {
     return (
       <div>
-        <div className="text-center">
-          <div>1、该项目是调用的阿里云语音合成API，需要填写appId和token。</div>
+        <div className="flex flex-col items-center">
+          <div>1、该项目是调用的阿里云语音合成API，需要填写AppKey和AccessToken。</div>
           <div>现在内测阶段暂时用开发者的阿里云账号，但是token可能会过期或不稳定。</div>
+          <div>可以联系开发者QQ 3127966867</div>
+          <Input
+            className="my-2"
+            style={{ width: 400 }}
+            placeholder="阿里云语音合成项目Appkey"
+            value={appkey}
+            onChange={(e) => setAppkey(e.target.value)}
+            />
+          <Input
+            style={{ width: 400 }}
+            placeholder="阿里云语音合成AccessToken"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+          />
         </div>
-        <div className="flex justify-center">
-          <Button className="mt-3" type="primary" size="large" onClick={() => setTmp(true)}>确定</Button>
+        <div className="mt-3 flex justify-center">
+          <Button
+            type="primary"
+            size="large"
+            onClick={async () => {
+              appConfig.appkey = appkey;
+              appConfig.token = token;
+              const { success, data } = await fetchTextVoice({ text: '测试', voiceId: 'xiaoyun' });
+              if(success) {
+                setTmp(true);
+              } else {
+                message.error('appkey或token出错，错误原因：' + data);
+              }
+            }}
+          >
+            确定
+          </Button>
+          <Button
+            className="ml-4"
+            size="large"
+            onClick={() => {
+              setAppkey(DEVELOPER_CONFIG.appkey);
+              setToken(DEVELOPER_CONFIG.token);
+            }}
+          >
+            使用开发者的临时账号(可能过期)
+          </Button>
         </div>
       </div>
     );
@@ -51,7 +93,6 @@ const Layout: React.FC<IRouteComponentProps> = ({ children, location }) => {
 
   return (
     <>
-      {/* <Header /> */}
       { children }
     </>
   )

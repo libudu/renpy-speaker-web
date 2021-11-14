@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const appConfig = {
+export const DEVELOPER_CONFIG = {
+  appkey: 'RaY4l2CprZpngu4A',
+  token: '6e7081f13fb24c16bf620c460f40fdce',
+};
+
+export const appConfig = {
   appkey: 'RaY4l2CprZpngu4A',
   token: '6e7081f13fb24c16bf620c460f40fdce',
 };
